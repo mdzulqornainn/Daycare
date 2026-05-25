@@ -23,6 +23,7 @@
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">ID Transaksi (Anak)</label>
                     <input type="number" id="id_transaksi" required class="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Contoh: 1">
+                    <p id="preview_nama_pengasuh" class="text-sm font-medium mt-1 hidden"></p>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">ID Pengasuh</label>
@@ -140,6 +141,36 @@
         }
         document.getElementById('btn-cancel').addEventListener('click', resetForm);
         loadData();
+
+        // Cek ID Pengasuh
+let daftarPengasuh = [];
+function ambilReferensiPengasuh() {
+    fetch('/api/pengasuh')
+        .then(res => res.json())
+        .then(data => daftarPengasuh = data)
+        .catch(err => console.error(err));
+}
+
+document.getElementById('id_individu_pengasuh').addEventListener('input', function(e) {
+    const inputId = parseInt(e.target.value);
+    const previewEl = document.getElementById('preview_nama_pengasuh');
+
+    if (!inputId) { previewEl.classList.add('hidden'); return; }
+
+    const pengasuhDitemukan = daftarPengasuh.find(p => p.id_individu === inputId);
+    previewEl.classList.remove('hidden');
+
+    if (pengasuhDitemukan) {
+        previewEl.innerText = '✅ Pengasuh: ' + pengasuhDitemukan.nama;
+        previewEl.className = 'text-sm font-medium text-emerald-600 mt-1';
+    } else {
+        previewEl.innerText = '❌ ID Pengasuh tidak ditemukan!';
+        previewEl.className = 'text-sm font-medium text-red-500 mt-1';
+    }
+});
+
+// Panggil fungsi
+ambilReferensiPengasuh();
     </script>
 </body>
 </html>

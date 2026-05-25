@@ -76,7 +76,7 @@
                         
                         // Perhatikan trx.nama_anak dipanggil berkat Query JOIN di Controller
                         tr.innerHTML = `
-                            <td class="p-4 font-bold text-blue-700">#TRX-${trx.id_transaksi}</td>
+                            <td class="p-4 font-bold text-blue-700">${trx.id_transaksi}</td>
                             <td class="p-4">
                                 <span class="font-medium text-slate-800">${trx.nama_anak || 'Nama Tidak Ditemukan'}</span>
                                 <div class="text-xs text-slate-500 mt-1">ID Anak: ${trx.id_anak}</div>
@@ -129,7 +129,7 @@
 
         // 3. Menyiapkan Form untuk Edit
         function editData(trx) {
-            document.getElementById('form-title').innerText = 'Edit Transaksi (#TRX-' + trx.id_transaksi + ')';
+            document.getElementById('form-title').innerText = 'Edit Transaksi (' + trx.id_transaksi + ')';
             document.getElementById('id_transaksi').value = trx.id_transaksi;
             document.getElementById('id_anak').value = trx.id_anak;
             document.getElementById('tanggal_titip').value = trx.tanggal_titip;

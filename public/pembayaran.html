@@ -76,8 +76,8 @@
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-slate-50";
                     tr.innerHTML = `
-                        <td class="p-4 font-semibold">#INV-${p.id_pembayaran}</td>
-                        <td class="p-4">#TRX-${p.id_transaksi}</td>
+                        <td class="p-4 font-semibold">${p.id_pembayaran}</td>
+                        <td class="p-4">${p.id_transaksi}</td>
                         <td class="p-4">${p.tanggal_bayar}</td>
                         <td class="p-4 font-medium">Rp ${Number(p.jumlah).toLocaleString('id-ID')}</td>
                         <td class="p-4"><span class="${statusClass} px-2.5 py-1 rounded-full text-xs font-semibold">${p.status}</span></td>

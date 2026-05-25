@@ -3,14 +3,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Anak;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; // Tambahkan ini agar bisa menggunakan Query JOIN
 use Exception;
 
 class AnakController extends Controller
 {
-    // 1. READ: Mengambil semua data
+    // 1. READ: Mengambil semua data anak beserta NAMA ORANG TUA
     public function index() {
-        // Otomatis urutkan dari yang terbaru
-        $data = Anak::orderBy('id_anak', 'desc')->get();
+        $data = DB::table('Anak')
+            ->join('Orang_Tua', 'Anak.id_individu_orangtua', '=', 'Orang_Tua.id_individu')
+            ->join('Individu', 'Orang_Tua.id_individu', '=', 'Individu.id_individu')
+            ->select('Anak.*', 'Individu.nama AS nama_orang_tua') // Mengambil nama dari tabel Individu
+            ->orderBy('Anak.id_anak', 'desc')
+            ->get();
+
         return response()->json($data);
     }
 
