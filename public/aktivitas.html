@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aktivitas Anak - Daycare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 font-sans pb-10">
+    <nav class="bg-blue-800 p-4 shadow-md text-white mb-6">
+        <div class="container mx-auto flex justify-between px-4 items-center">
+            <h1 class="text-xl font-bold">Manajemen Aktivitas Anak</h1>
+            <a href="index.html" class="text-sm bg-blue-700 hover:bg-blue-600 px-4 py-2 rounded transition-colors">⬅ Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 max-w-6xl">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8">
+            <h3 id="form-title" class="text-lg font-bold mb-5 text-slate-800 border-b pb-2">Catat Aktivitas Baru</h3>
+            <form id="formAktivitas" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <input type="hidden" id="id_aktivitas">
+                
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">ID Transaksi (Anak)</label>
+                    <input type="number" id="id_transaksi" required class="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Contoh: 1">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">ID Pengasuh</label>
+                    <input type="number" id="id_individu_pengasuh" required class="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Contoh: 6">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Kegiatan</label>
+                    <input type="text" id="kegiatan" required class="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Misal: Tidur Siang">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Jam Kegiatan</label>
+                    <input type="time" id="jam_kegiatan" required class="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Catatan Tambahan</label>
+                    <input type="text" id="catatan" required class="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Misal: Anak tidur pulas">
+                </div>
+                
+                <div class="md:col-span-2 flex gap-3">
+                    <button type="submit" id="btn-submit" class="bg-blue-600 text-white font-medium px-6 py-2.5 rounded-lg hover:bg-blue-700 transition-colors">Simpan Aktivitas</button>
+                    <button type="button" id="btn-cancel" class="hidden bg-slate-500 text-white font-medium px-6 py-2.5 rounded-lg hover:bg-slate-600 transition-colors">Batal</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-100 text-slate-700 uppercase text-sm border-b">
+                        <th class="p-4 font-semibold">Waktu</th>
+                        <th class="p-4 font-semibold">TRX & Pengasuh</th>
+                        <th class="p-4 font-semibold">Kegiatan</th>
+                        <th class="p-4 font-semibold">Catatan</th>
+                        <th class="p-4 font-semibold text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="data-aktivitas" class="divide-y divide-slate-200"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const apiUrl = '/api/aktivitas';
+
+        function loadData() {
+            fetch(apiUrl).then(res => res.json()).then(data => {
+                const tbody = document.getElementById('data-aktivitas');
+                tbody.innerHTML = '';
+                data.forEach(a => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50";
+                    tr.innerHTML = `
+                        <td class="p-4 font-medium text-blue-700">${a.jam_kegiatan}</td>
+                        <td class="p-4"><span class="text-xs bg-slate-200 px-2 py-1 rounded">TRX: ${a.id_transaksi}</span> <span class="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded">PG: ${a.id_individu_pengasuh}</span></td>
+                        <td class="p-4 font-semibold">${a.kegiatan}</td>
+                        <td class="p-4 italic text-slate-600">${a.catatan}</td>
+                        <td class="p-4 text-center">
+                            <button onclick='editData(${JSON.stringify(a)})' class="bg-amber-400 text-amber-900 px-3 py-1 rounded text-sm mr-1">Edit</button>
+                            <button onclick="hapusData(${a.id_aktivitas})" class="bg-red-500 text-white px-3 py-1 rounded text-sm">Hapus</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+        }
+
+        document.getElementById('formAktivitas').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = document.getElementById('id_aktivitas').value;
+            const payload = {
+                id_transaksi: document.getElementById('id_transaksi').value,
+                id_individu_pengasuh: document.getElementById('id_individu_pengasuh').value,
+                kegiatan: document.getElementById('kegiatan').value,
+                jam_kegiatan: document.getElementById('jam_kegiatan').value,
+                catatan: document.getElementById('catatan').value
+            };
+            let method = id === '' ? 'POST' : 'PUT';
+            let url = id === '' ? apiUrl : `${apiUrl}/${id}`;
+
+            fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(res => res.json()).then(res => {
+                alert(res.pesan);
+                if(res.status === 'sukses') { resetForm(); loadData(); }
+            });
+        });
+
+        function editData(a) {
+            document.getElementById('form-title').innerText = 'Edit Aktivitas';
+            document.getElementById('id_aktivitas').value = a.id_aktivitas;
+            document.getElementById('id_transaksi').value = a.id_transaksi;
+            document.getElementById('id_individu_pengasuh').value = a.id_individu_pengasuh;
+            document.getElementById('kegiatan').value = a.kegiatan;
+            document.getElementById('jam_kegiatan').value = a.jam_kegiatan;
+            document.getElementById('catatan').value = a.catatan;
+            document.getElementById('btn-submit').innerText = 'Update Aktivitas';
+            document.getElementById('btn-cancel').classList.remove('hidden');
+        }
+
+        function hapusData(id) {
+            if(confirm('Hapus log aktivitas ini?')) {
+                fetch(`${apiUrl}/${id}`, { method: 'DELETE' })
+                .then(res => res.json()).then(res => { alert(res.pesan); loadData(); });
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('formAktivitas').reset();
+            document.getElementById('id_aktivitas').value = '';
+            document.getElementById('form-title').innerText = 'Catat Aktivitas Baru';
+            document.getElementById('btn-submit').innerText = 'Simpan Aktivitas';
+            document.getElementById('btn-cancel').classList.add('hidden');
+        }
+        document.getElementById('btn-cancel').addEventListener('click', resetForm);
+        loadData();
+    </script>
+</body>
+</html>

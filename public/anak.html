@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Anak - Daycare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 font-sans pb-10">
+    <nav class="bg-blue-800 p-4 shadow-md text-white mb-6">
+        <div class="container mx-auto flex justify-between px-4 items-center">
+            <h1 class="text-xl font-bold">Manajemen Data Anak</h1>
+            <a href="index.html" class="text-sm bg-blue-700 hover:bg-blue-600 px-4 py-2 rounded transition-colors">⬅ Kembali ke Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 max-w-6xl">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8">
+            <h3 id="form-title" class="text-lg font-bold mb-5 text-slate-800 border-b pb-2">Tambah Data Anak Baru</h3>
+            <form id="formAnak" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <input type="hidden" id="id_anak">
+                
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">ID Orang Tua</label>
+                    <input type="number" id="id_individu_orangtua" required placeholder="Contoh: 1" class="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Anak</label>
+                    <input type="text" id="nama_anak" required placeholder="Nama lengkap" class="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Tanggal Lahir</label>
+                    <input type="date" id="tanggal_lahir" required class="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Jenis Kelamin</label>
+                    <select id="jenis_kelamin" required class="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+                        <option value="">-- Pilih --</option>
+                        <option value="L">Laki-laki (L)</option>
+                        <option value="P">Perempuan (P)</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Alergi</label>
+                    <input type="text" id="alergi" required placeholder="Isi '-' jika tidak ada alergi" class="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+                
+                <div class="md:col-span-2 flex gap-3 mt-2">
+                    <button type="submit" id="btn-submit" class="bg-blue-600 text-white font-medium px-6 py-2.5 rounded-lg hover:bg-blue-700 transition-colors shadow-sm">Simpan Data</button>
+                    <button type="button" id="btn-cancel" class="hidden bg-slate-500 text-white font-medium px-6 py-2.5 rounded-lg hover:bg-slate-600 transition-colors shadow-sm">Batal Edit</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 uppercase text-sm tracking-wider">
+                            <th class="p-4 border-b font-semibold">ID</th>
+                            <th class="p-4 border-b font-semibold">ID Ortu</th>
+                            <th class="p-4 border-b font-semibold">Nama Anak</th>
+                            <th class="p-4 border-b font-semibold">Tgl Lahir</th>
+                            <th class="p-4 border-b font-semibold">L/P</th>
+                            <th class="p-4 border-b font-semibold">Alergi</th>
+                            <th class="p-4 border-b font-semibold text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-anak" class="divide-y divide-slate-200 text-slate-800">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiUrl = '/api/anak';
+
+        // 1. READ Data
+        function loadData() {
+            fetch(apiUrl)
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.getElementById('data-anak');
+                    tbody.innerHTML = ''; 
+                    
+                    data.forEach(anak => {
+                        const tr = document.createElement('tr');
+                        tr.className = "hover:bg-slate-50 transition-colors";
+                        tr.innerHTML = `
+                            <td class="p-4">${anak.id_anak}</td>
+                            <td class="p-4 text-slate-500">${anak.id_individu_orangtua}</td>
+                            <td class="p-4 font-medium">${anak.nama_anak}</td>
+                            <td class="p-4">${anak.tanggal_lahir}</td>
+                            <td class="p-4">${anak.jenis_kelamin}</td>
+                            <td class="p-4 text-red-500">${anak.alergi}</td>
+                            <td class="p-4 text-center">
+                                <button onclick='editData(${JSON.stringify(anak)})' class="bg-amber-400 text-amber-900 font-medium px-3 py-1 rounded hover:bg-amber-500 mr-2 text-sm">Edit</button>
+                                <button onclick="hapusData(${anak.id_anak})" class="bg-red-500 text-white font-medium px-3 py-1 rounded hover:bg-red-600 text-sm">Hapus</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(err => console.error('Error fetching data:', err));
+        }
+
+        // 2. CREATE & UPDATE Data
+        document.getElementById('formAnak').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const id_anak = document.getElementById('id_anak').value;
+            const payload = {
+                id_individu_orangtua: document.getElementById('id_individu_orangtua').value,
+                nama_anak: document.getElementById('nama_anak').value,
+                tanggal_lahir: document.getElementById('tanggal_lahir').value,
+                jenis_kelamin: document.getElementById('jenis_kelamin').value,
+                alergi: document.getElementById('alergi').value
+            };
+
+            let methodType = 'POST';
+            let targetUrl = apiUrl; 
+
+            // Deteksi jika ini adalah proses Update (PUT)
+            if (id_anak !== '') {
+                methodType = 'PUT';
+                targetUrl = `${apiUrl}/${id_anak}`; 
+            }
+
+            fetch(targetUrl, {
+                method: methodType,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(response => {
+                alert(response.pesan);
+                if(response.status === 'sukses') {
+                    resetForm();
+                    loadData(); 
+                }
+            })
+            .catch(err => console.error('Error saving data:', err));
+        });
+
+        // 3. Menyiapkan Form untuk Edit
+        function editData(anak) {
+            document.getElementById('form-title').innerText = 'Edit Data Anak (ID: ' + anak.id_anak + ')';
+            document.getElementById('id_anak').value = anak.id_anak;
+            document.getElementById('id_individu_orangtua').value = anak.id_individu_orangtua;
+            document.getElementById('nama_anak').value = anak.nama_anak;
+            document.getElementById('tanggal_lahir').value = anak.tanggal_lahir;
+            document.getElementById('jenis_kelamin').value = anak.jenis_kelamin;
+            document.getElementById('alergi').value = anak.alergi;
+            
+            document.getElementById('btn-submit').innerText = 'Update Data';
+            document.getElementById('btn-submit').classList.replace('bg-blue-600', 'bg-amber-500');
+            document.getElementById('btn-submit').classList.replace('hover:bg-blue-700', 'hover:bg-amber-600');
+            document.getElementById('btn-cancel').classList.remove('hidden');
+            
+            // Scroll otomatis ke atas (ke arah form)
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 4. DELETE Data
+        function hapusData(id) {
+            if(confirm('Yakin ingin menghapus data ini secara permanen?')) {
+                fetch(`${apiUrl}/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then(res => res.json())
+                .then(response => {
+                    alert(response.pesan);
+                    if(response.status === 'sukses') {
+                        loadData(); 
+                    }
+                })
+                .catch(err => console.error('Error deleting data:', err));
+            }
+        }
+
+        // 5. Reset Form
+        function resetForm() {
+            document.getElementById('formAnak').reset();
+            document.getElementById('id_anak').value = '';
+            document.getElementById('form-title').innerText = 'Tambah Data Anak Baru';
+            
+            document.getElementById('btn-submit').innerText = 'Simpan Data';
+            document.getElementById('btn-submit').classList.replace('bg-amber-500', 'bg-blue-600');
+            document.getElementById('btn-submit').classList.replace('hover:bg-amber-600', 'hover:bg-blue-700');
+            
+            document.getElementById('btn-cancel').classList.add('hidden');
+        }
+
+        document.getElementById('btn-cancel').addEventListener('click', resetForm);
+
+        // Load data pertama kali
+        loadData();
+    </script>
+</body>
+</html>
