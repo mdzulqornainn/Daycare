@@ -22,16 +22,16 @@
                 
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">ID Transaksi (Anak)</label>
-                   <input type="number" id="id_transaksi" min="1" oninput="if(this.value < 1) this.value = '';" required class="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Contoh: 1">
+                   <input type="number" id="id_transaksi" min="1" oninput="if(this.value < 1) this.value = '';" required class="w-full border border-slate-300 p-2.5 placeholder:italic rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Contoh: 1">
                     <p id="preview_nama_pengasuh" class="text-sm font-medium mt-1 hidden"></p>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">ID Pengasuh</label>
-                    <input type="number" id="id_individu_pengasuh" min="1" oninput="if(this.value < 1) this.value = '';" required class="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Contoh: 6">
+                    <input type="number" id="id_individu_pengasuh" min="1" oninput="if(this.value < 1) this.value = '';" required class="w-full border placeholder:italic border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Contoh: 6">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">Kegiatan</label>
-                    <input type="text" id="kegiatan" required class="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Misal: Tidur Siang">
+                    <input type="text" id="kegiatan" required class="placeholder:italic w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Misal: Tidur Siang">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">Jam Kegiatan</label>
@@ -39,7 +39,7 @@
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-semibold text-slate-700 mb-1">Catatan Tambahan</label>
-                    <input type="text" id="catatan" required class="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Misal: Anak tidur pulas">
+                    <input type="text" id="catatan" required class="placeholder:italic w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Misal: Anak tidur pulas">
                 </div>
                 
                 <div class="md:col-span-2 flex gap-3">
@@ -54,12 +54,12 @@
                 <thead>
                     <tr class="bg-slate-100 text-slate-700 uppercase text-sm border-b">
                         <th class="p-4 font-semibold">Waktu</th>
-                        <th class="p-4 font-semibold">TRX & Pengasuh</th>
+                        <th class="p-4 font-semibold">Nama Pengasuh</th> 
                         <th class="p-4 font-semibold">Kegiatan</th>
                         <th class="p-4 font-semibold">Catatan</th>
-                        <th class="p-4 font-semibold text-center">Aksi</th>
+                        <th class="p-4 text-center">Aksi</th>
                     </tr>
-                </thead>
+            </thead>
                 <tbody id="data-aktivitas" class="divide-y divide-slate-200"></tbody>
             </table>
         </div>
@@ -68,6 +68,7 @@
     <script>
         const apiUrl = '/api/aktivitas';
 
+        // 1. READ Data
         function loadData() {
             fetch(apiUrl).then(res => res.json()).then(data => {
                 const tbody = document.getElementById('data-aktivitas');
@@ -77,7 +78,7 @@
                     tr.className = "hover:bg-slate-50";
                     tr.innerHTML = `
                         <td class="p-4 font-medium text-blue-700">${a.jam_kegiatan}</td>
-                        <td class="p-4"><span class="text-xs bg-slate-200 px-2 py-1 rounded">TRX: ${a.id_transaksi}</span> <span class="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded">PG: ${a.id_individu_pengasuh}</span></td>
+                        <td class="p-4 font-semibold text-slate-800">${a.nama_pengasuh || 'Tidak Ditemukan'}</td> 
                         <td class="p-4 font-semibold">${a.kegiatan}</td>
                         <td class="p-4 italic text-slate-600">${a.catatan}</td>
                         <td class="p-4 text-center">
